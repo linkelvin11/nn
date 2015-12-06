@@ -11,8 +11,8 @@ public:
     int getN_i() { return N_i; }
     int getN_o() { return N_o; }
     int getN_s() { return N_s; }
-    int getFeature(int s, int i){ return features[s][i]; }
-    int getLabel(int s, int i){ return labels[s][i]; }
+    double getFeature(int s, int i){ return features[s][i]; }
+    double getLabel(int s, int i){ return labels[s][i]; }
 
 };
 

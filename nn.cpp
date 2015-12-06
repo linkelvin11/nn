@@ -102,7 +102,7 @@ void NeuralNet::train(Dataset &data, double learnRate, int numEpochs){
                 activations[0][i] = data.getFeature(s,i);
             }
             // keep in mind the bias is stored at index 0
-            // activations[0][0] = 1;
+            // activations[0][0] = -1;
 
             cout << "forward propagate the activations\n";
             // for the non-input layers, forward propagate the activations
@@ -145,21 +145,13 @@ void NeuralNet::train(Dataset &data, double learnRate, int numEpochs){
                 for(int i = 0; i < weights[l].size()-1; i++){
                     for(int j = 0; j < weights[l][i+1].size(); j++){
                         weights[l][i+1][j] += deltas[l+1][j] * activations[l][i] * learnRate;
-                        // if (i == 0)
-                        //     weights[l][0][j] -= learnRate * deltas[l+1][j];
+                        if (i == 0)
+                            weights[l][0][j] -= learnRate * deltas[l+1][j];
                     }
                     
                 }
             }
-            for(int i = 0; i < activations.size(); i++){
-                for(int j = 0; j < activations[i].size(); j++){
-                    cout << activations[i][j] << ' ';
-                }
-                cout << endl;
-            }
-
-        }
- 
+        } 
     }
 
     this->save("trainedoutput.txt");
