@@ -1,4 +1,4 @@
-checkers.exe: nn.cpp constants.h
+nn.exe: nn.cpp constants.h
 	g++ -std=c++11 -o nn.exe nn.cpp
 
 debug: nn.cpp constants.h

@@ -83,8 +83,8 @@ void NeuralNet::train(Dataset &data, double learnRate, int numEpochs){
 
     // initialize a few variables to help with bookkeeping
     vector< vector<double> > activations(3,vector<double>(1,0));
-    activations[0].resize(N_i+1);
-    activations[1].resize(N_h+1);
+    activations[0].resize(N_i);
+    activations[1].resize(N_h);
     activations[2].resize(N_o);
 
     vector< vector<double> > layerSum(activations);
@@ -96,28 +96,27 @@ void NeuralNet::train(Dataset &data, double learnRate, int numEpochs){
     for(int epoch = 0; epoch < numEpochs; epoch++){
         for(int s = 0; s < numSamples; s++){
 
-            cout << "initialize input layer for sample " << s << endl;
+            cout << "initialize input layer for sample " << s+1 << endl;
             // for each node i in the input layer get the activation
             for(int i = 0; i < N_i; i++){
                 activations[0][i] = data.getFeature(s,i);
             }
-            //activations[0][N_i] = 1;
+            // keep in mind the bias is stored at index 0
+            // activations[0][0] = 1;
 
             cout << "forward propagate the activations\n";
             // for the non-input layers, forward propagate the activations
             for(int l = 1; l < 3; l++){
-                // for each node j in the layer, update the activation from the previous layer
+                // for each node j in the layer, update the activation using the previous layer
                 for(int j = 0; j < activations[l].size(); j++){
                     //layerSum[l][j] = 0;
-                    // layerSum[l][j] = weights[l-1][j][weights[l-1][j].size()-1];
+                    layerSum[l][j] = weights[l-1][0][j] * -1;
                     // for each node k in the previous layer, add the weighted activation to the current node
                     for(int k = 0; k < activations[l-1].size(); k++){
-                        layerSum[l][j] += weights[l-1][k][j] * activations[l-1][k];
+                        layerSum[l][j] += weights[l-1][k+1][j] * activations[l-1][k];
                     }
                     activations[l][j] = SIG(layerSum[l][j]);
                 }
-                // if (l < 2)
-                //     activations[l][activations[l].size()-1] = 1;
             }
 
             cout << "calculate deltas for output layer\n";
@@ -135,7 +134,7 @@ void NeuralNet::train(Dataset &data, double learnRate, int numEpochs){
             for (int h = 0; h < deltas[1].size()-1; h++){
                 // loop through next layer to get sum of the deltas * weights
                 for (int o = 0; o < deltas[2].size(); o++){
-                    tmp += weights[1][h][o] * deltas[2][o];
+                    tmp += weights[1][h+1][o] * deltas[2][o];
                 }
                 deltas[1][h] = SIGD(layerSum[1][h]) * tmp;
             }
@@ -143,11 +142,20 @@ void NeuralNet::train(Dataset &data, double learnRate, int numEpochs){
             cout << "update each weight\n";
             // loop through each weight in the network and apply the update equation
             for(int l = 0; l < weights.size(); l++){
-                for(int i = 0; i < weights[l].size(); i++){
-                    for(int j = 0; j < weights[l][i].size(); j++){
-                        weights[l][i][j] += deltas[l+1][j] * activations[l][i] * learnRate;
+                for(int i = 0; i < weights[l].size()-1; i++){
+                    for(int j = 0; j < weights[l][i+1].size(); j++){
+                        weights[l][i+1][j] += deltas[l+1][j] * activations[l][i] * learnRate;
+                        // if (i == 0)
+                        //     weights[l][0][j] -= learnRate * deltas[l+1][j];
                     }
+                    
                 }
+            }
+            for(int i = 0; i < activations.size(); i++){
+                for(int j = 0; j < activations[i].size(); j++){
+                    cout << activations[i][j] << ' ';
+                }
+                cout << endl;
             }
 
         }
