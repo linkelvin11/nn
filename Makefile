@@ -1,5 +1,5 @@
-nn.exe: nn.cpp constants.h
-	g++ -std=c++11 -o nn.exe nn.cpp
+nn.exe: main.cpp nn.cpp constants.h
+	g++ -std=c++11 -o nn.exe main.cpp nn.cpp
 
 debug: nn.cpp constants.h
 	g++ -g -std=c++11 -o Debugnn.exe nn.cpp

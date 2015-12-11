@@ -58,14 +58,18 @@ bool NeuralNet::save(string outfile){
 
     for(int h = 0; h < N_h; h++){
         for (int i = 0; i < N_i+1; i++){
-            fileout << weights[0][i][h] << ' ';
+            fileout << weights[0][i][h];
+            if (i < N_i)
+                fileout << ' ';
         }
         fileout << endl;
     }
 
     for(int o = 0; o < N_o; o++){
         for(int h = 0; h < N_h+1; h++){
-            fileout << weights[1][h][o] << ' ';
+            fileout << weights[1][h][o];
+            if (h < N_h)
+                fileout << ' ';
         }
         fileout << endl;
     }
@@ -94,7 +98,7 @@ void NeuralNet::train(Dataset &data, double learnRate, int numEpochs){
 
     int numSamples = data.getN_s();
     for(int epoch = 0; epoch < numEpochs; epoch++){
-        cout << "starting epoch " << epoch << endl;
+        cout << "starting epoch " << epoch << ". ";
         for(int s = 0; s < numSamples; s++){
 
             //cout << "initialize input layer for sample " << s+1 << endl;
@@ -108,7 +112,6 @@ void NeuralNet::train(Dataset &data, double learnRate, int numEpochs){
             for(int l = 1; l < 3; l++){
                 // for each node j in the layer, update the activation using the previous layer
                 for(int j = 0; j < activations[l].size(); j++){
-                    //layerSum[l][j] = 0;
                     layerSum[l][j] = weights[l-1][0][j] * -1;
                     // for each node k in the previous layer, add the weighted activation to the current node
                     for(int k = 0; k < activations[l-1].size(); k++){
@@ -129,7 +132,7 @@ void NeuralNet::train(Dataset &data, double learnRate, int numEpochs){
             // go back through the layers and calculate delta for each node
             // only 1 hidden layer, so no looping through layers. Just update hidden layer
             // for each node h in layer update the delta
-            for (int h = 0; h < deltas[1].size()-1; h++){
+            for (int h = 0; h < deltas[1].size(); h++){
                 tmp = 0;
                 // loop through next layer to get sum of the deltas * weights
                 for (int o = 0; o < deltas[2].size(); o++){
@@ -149,12 +152,9 @@ void NeuralNet::train(Dataset &data, double learnRate, int numEpochs){
                     }
                 }
             }
-        } 
+        }
+        cout << "Epoch " << epoch << "complete.\n";
     }
-
-    this->save("trainedoutput.txt");
-
-
 }
 
 void NeuralNet::test(Dataset &data){
@@ -272,17 +272,3 @@ bool Dataset::save(string outfile){
 
 }
 
-int main(){
-    NeuralNet a;
-    a.load(string("wdbc.init"));
-    //a.save(string("save.txt"));
-    Dataset d;
-    d.load("wdbc.train");
-    a.train(d,0.1,100);
-    a.save("100epochstrained.txt");
-
-    Dataset tester;
-    tester.load("wdbc.test");
-    a.test(tester);
-    return 0;
-}
