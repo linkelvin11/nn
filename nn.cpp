@@ -266,9 +266,3 @@ bool Dataset::load(string infile){
         }
     }
 }
-
-// save a testing set
-bool Dataset::save(string outfile){
-
-}
-

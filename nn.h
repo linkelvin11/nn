@@ -25,7 +25,6 @@ class NeuralNet {
 
 public:
     bool load(std::string infile);
-    bool save(std::string outfile);
     void train(Dataset &data, double learnRate, int numEpochs);
     void test(Dataset &data);
 };
