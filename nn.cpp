@@ -3,6 +3,10 @@
 // define logistic sigmoid and its derivative
 #define SIG(x) 1/(1+exp(-x))
 #define SIGD(x) SIG(x)*(1-SIG(x))
+#define A 0
+#define B 1
+#define C 2
+#define D 3
 
 using namespace std;
 
@@ -153,11 +157,11 @@ void NeuralNet::train(Dataset &data, double learnRate, int numEpochs){
                 }
             }
         }
-        cout << "Epoch " << epoch << "complete.\n";
+        cout << "Epoch " << epoch << " complete.\n";
     }
 }
 
-void NeuralNet::test(Dataset &data){
+void NeuralNet::test(Dataset &data, string outfile){
 
     // verify the dataset matches the neural net
     if (N_i != data.getN_i() || N_o != data.getN_o()){
@@ -173,13 +177,7 @@ void NeuralNet::test(Dataset &data){
     activations[2].resize(N_o);
     vector< vector<double> > layerSum(activations);
 
-    vector< vector<double> > results;
-    results.resize(numSamples);
-
-    double a = 0;
-    double b = 0;
-    double c = 0;
-    double d = 0;
+    vector< vector<double> > results(N_o,vector<double>(4,0));
 
     // for each sample run the neural net
     for (int s = 0; s < numSamples; s++){
@@ -204,32 +202,81 @@ void NeuralNet::test(Dataset &data){
 
         // store the results and update metrics
         for(int o = 0; o < N_o; o++){
-            //cout << activations[2][0] << " ";;
             activations[2][o] = round(activations[2][o]);
             if (data.getLabel(s,o)){
                 if (activations[2][o])
-                    a++;
+                    results[o][A]++;
                 else
-                    c++;
+                    results[o][C]++;
             }
             else {
                 if (activations[2][o])
-                    b++;
+                    results[o][B]++;
                 else
-                    d++;
+                    results[o][D]++;
             }
         }
-        //cout << endl;
-
-        results[s] = activations[2];
     }
 
-    cout << "overall accuracy: " << (a+d)/(numSamples) << endl;
-    cout << a << endl;
-    cout << c << endl;
-    cout << b << endl;
-    cout << d << endl;
+    // print results
+    double a = 0, a_tot = 0;
+    double b = 0, b_tot = 0;
+    double c = 0, c_tot = 0;
+    double d = 0, d_tot = 0;
+    double acc = 0, micro_acc = 0, macro_acc = 0;   //accuracy
+    double prec = 0, micro_prec = 0, macro_prec = 0;//precision
+    double rec = 0, micro_rec = 0, macro_rec;       //recall
+    double f1 = 0, micro_f1 = 0, macro_f1 = 0;      //f1
+    string sp(" ");
 
+    ofstream fileout;
+    fileout.open(outfile);
+    fileout.setf(ios::fixed,ios::floatfield);
+
+    // print stats for each output
+    for (int o = 0; o < N_o; o++){
+        a = results[o][A];
+        b = results[o][B];
+        c = results[o][C];
+        d = results[o][D];
+
+        a_tot += a;
+        b_tot += b;
+        c_tot += c;
+        d_tot += d;
+
+        acc = (a+d)/(a+b+c+d);
+        prec = a/(a+b);
+        rec = a/(a+c);
+        f1 = (2*prec*rec)/(prec+rec);
+
+        macro_acc += acc;
+        macro_prec += prec;
+        macro_rec += rec;
+
+        fileout.precision(0);
+        fileout << a << sp << b << sp << c << sp << d;
+
+        fileout.setf(ios::fixed,ios::floatfield);
+        fileout.precision(3);
+        fileout << sp << acc << sp << prec << sp << rec << sp << f1 << endl;
+    }
+
+    // calculate micro averages
+    micro_acc = (a_tot+d_tot)/(a_tot+b_tot+c_tot+d_tot);
+    micro_prec = a_tot/(a_tot+b_tot);
+    micro_rec = a_tot/(a_tot+c_tot);
+    micro_f1 = (2*micro_prec*micro_rec)/(micro_prec+micro_rec);
+
+    fileout << micro_acc << sp << micro_prec << sp << micro_rec << sp << micro_f1 << endl;
+
+    // calculate macro averages
+    macro_acc /= N_o;
+    macro_prec /= N_o;
+    macro_rec /= N_o;
+    macro_f1 = (2*macro_prec*macro_rec)/(macro_prec+macro_rec);
+
+    fileout << macro_acc << sp << macro_prec << sp << macro_rec << sp << macro_f1 << endl;
 }
 
 // load a training set

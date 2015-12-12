@@ -4,10 +4,12 @@
 
 using namespace std;
 
+NeuralNet a;
+Dataset d;
+string instring;
+
 void train_network(){
-    NeuralNet a;
-    Dataset d;
-    string instring;
+
     double learnRate;
     int numEpochs;
 
@@ -37,11 +39,23 @@ void train_network(){
 }
 
 void test_network(){
+	cout << "enter the name of your neural net file: ";
+	cin >> instring;
+	a.load(instring);
 
+	cout << "enter the name of your test file: ";
+	cin >> instring;
+	d.load(instring);
+
+	cout << "enter the name of your output file: ";
+	cin >> instring;
+
+	cout << "starting testing function\n";
+	a.test(d,instring);
+	cout << "testing completed. saving output to file\n";
 }
 
 int main(){
-	string instring;
 
 	while(1) {
 		cout << "would you like to train or test? (train/test)\n";
