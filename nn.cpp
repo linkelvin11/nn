@@ -133,16 +133,14 @@ void NeuralNet::train(Dataset &data, double learnRate, int numEpochs){
 
     int numSamples = data.getN_s();
     for(int epoch = 0; epoch < numEpochs; epoch++){
-        cout << "starting epoch " << epoch << ". ";
+        cout << "starting epoch " << epoch << endl;
         for(int s = 0; s < numSamples; s++){
 
-            //cout << "initialize input layer for sample " << s+1 << endl;
             // for each node i in the input layer get the activation
             for(int i = 0; i < N_i; i++){
                 activations[0][i] = data.getFeature(s,i);
             }
 
-            //cout << "forward propagate the activations\n";
             // for the non-input layers, forward propagate the activations
             for(int l = 1; l < 3; l++){
                 // for each node j in the layer, update the activation using the previous layer
@@ -156,14 +154,12 @@ void NeuralNet::train(Dataset &data, double learnRate, int numEpochs){
                 }
             }
 
-            //cout << "calculate deltas for output layer\n";
             // propagate deltas backward from output layer
             // for each node o in the output layer, get the delta
             for(int o = 0; o < N_o; o++){
                 deltas[2][o] = SIGD(layerSum[2][o]) * (data.getLabel(s,o) - activations[2][o]);
             }
 
-            //cout << "back propagate the deltas from the output layer\n";
             // go back through the layers and calculate delta for each node
             // only 1 hidden layer, so no looping through layers. Just update hidden layer
             // for each node h in layer update the delta
@@ -176,7 +172,6 @@ void NeuralNet::train(Dataset &data, double learnRate, int numEpochs){
                 deltas[1][h] = SIGD(layerSum[1][h]) * tmp;
             }
 
-            // cout << "update each weight\n";
             // loop through each weight in the network and apply the update equation
             for(int l = 0; l < weights.size(); l++){
                 for(int i = 0; i < weights[l].size()-1; i++){
@@ -188,7 +183,6 @@ void NeuralNet::train(Dataset &data, double learnRate, int numEpochs){
                 }
             }
         }
-        cout << "Epoch " << epoch << " complete.\n";
     }
 }
 

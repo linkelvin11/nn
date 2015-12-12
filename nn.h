@@ -20,7 +20,6 @@ class NeuralNet {
     int N_i, N_h, N_o;
     // store weights in a 3D vector (layers,i,j)
     std::vector< std::vector< std::vector<double> > > weights;
-    //std::vector< std::vector< std::vector<double> > > activations;
 
 public:
     bool load(std::string infile);
