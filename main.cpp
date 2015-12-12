@@ -55,6 +55,28 @@ void test_network(){
 	cout << "testing completed. saving output to file\n";
 }
 
+void gen_network(){
+	int inputs;
+	int hidden;
+	int outputs;
+	cout << "inputs: ";
+	cin >> instring;
+	inputs = stoi(instring);
+
+	cout << "hidden: ";
+	cin >> instring;
+	hidden = stoi(instring);
+
+	cout << "outputs: ";
+	cin >> instring;
+	outputs = stoi(instring);
+
+	a.generate(inputs,hidden,outputs);
+	cout << "filename: ";
+	cin >> instring;
+	a.save(instring);
+}
+
 int main(){
 
 	while(1) {
@@ -66,6 +88,10 @@ int main(){
 		}
 		if (regex_match(instring,regex("test"))) {
 			test_network();
+			break;
+		}
+		if (regex_match(instring,regex("gen"))){
+			gen_network();
 			break;
 		}
 		cout << "invalid input. try again.\n";

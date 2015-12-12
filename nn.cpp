@@ -10,6 +10,37 @@
 
 using namespace std;
 
+void NeuralNet::generate(int input, int hidden, int output){
+    srand(time(NULL));
+
+    N_i = input;
+    N_o = output;
+    N_h = hidden;
+
+    //resize weights array accounting for bias
+    weights.resize(2);
+    weights[0].resize(N_i+1);
+    for(int i = 0; i < weights[0].size(); i++){
+        weights[0][i].resize(N_h);
+    }
+    weights[1].resize(N_h+1);
+    for(int h = 0; h < weights[1].size(); h++){
+        weights[1][h].resize(N_o);
+    }
+
+    // load weights from file
+    for (int h = 0; h < N_h; h++){
+        for (int i = 0;i < N_i+1; i++){
+            weights[0][i][h] = (double)(rand() % 500)/1000;
+        }
+    }
+    for (int o = 0; o < N_o; o++){
+        for (int h = 0; h < N_h+1; h++){
+            weights[1][h][o] = (double)(rand() % 500)/1000;
+        }
+    }
+}
+
 bool NeuralNet::load(string infile){
     ifstream filein;
     filein.open(infile);

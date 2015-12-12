@@ -27,5 +27,6 @@ public:
     bool save(std::string outfile);
     void train(Dataset &data, double learnRate, int numEpochs);
     void test(Dataset &data, std::string outfile);
+    void generate(int input, int hidden, int output);
 };
 
